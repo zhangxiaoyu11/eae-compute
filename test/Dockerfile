@@ -23,12 +23,11 @@ COPY ./.eslintrc /usr/app/.eslintrc
 COPY ./config/eae.compute.test.config.js /usr/app/config/eae.compute.config.js
 
 # Install eae-compute npm dependencies
-RUN npm install --production
+RUN npm ci
 
 # Cleaning up
 RUN apk del git \
     && rm -rf /var/cache/apk/* \
-    && npm cache clean --force \
-    && npm uninstall --global npm
+    && npm cache clean --force
 
 EXPOSE 80
