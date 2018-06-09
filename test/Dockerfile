@@ -7,8 +7,7 @@ RUN apk --update add --no-cache \
     python2 \
     python3 \
     py-pip \
-    R \
-    && pip install --upgrade pip
+    R
 
 # Create app directories
 RUN mkdir -p /usr/app && mkdir -p /usr/test
