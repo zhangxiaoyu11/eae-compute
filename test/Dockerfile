@@ -1,13 +1,13 @@
 # Select source image
-FROM node:wheezy
+FROM node:10-alpine
 
 # Install all dependencies
-RUN apt-get update -q                                   \
-    && apt-get upgrade -y --no-install-recommends       \
-    && apt-get install -y python-pip                    \
-    && apt-get install -y python3                       \
-    && apt-get install -y python3-pip                   \
-    && apt-get install -y r-base
+RUN apk --update add --no-cache \
+    git \
+    python2 \
+    python3 \
+    py-pip \
+    && pip install --upgrade pip
 
 # Create app directories
 RUN mkdir -p /usr/app && mkdir -p /usr/test
@@ -15,15 +15,20 @@ WORKDIR /usr/app
 
 # Install app dependencies
 COPY ./package.json /usr/app/
-# Install eae-compute npm dependencies
-RUN npm install --silent; exit 0;
-RUN cat /root/.npm/_logs/*; exit 0;
-
-# Bundle app
+COPY ./package-lock.json /usr/app/
 COPY ./src /usr/app/src
-COPY ./.eslintrc /usr/app/.eslintrc
-COPY ./test/*.js /usr/app/test/
 COPY ./test/jobs /usr/app/test/jobs
+COPY ./test/*.js /usr/app/test/
+COPY ./.eslintrc /usr/app/.eslintrc
 COPY ./config/eae.compute.test.config.js /usr/app/config/eae.compute.config.js
+
+# Install eae-compute npm dependencies
+RUN npm install --production
+
+# Cleaning up
+RUN apk del git \
+    && rm -rf /var/cache/apk/* \
+    && npm cache clean --force \
+    && npm uninstall --global npm
 
 EXPOSE 80

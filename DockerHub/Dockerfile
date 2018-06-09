@@ -1,28 +1,38 @@
 # Select source image
-FROM node:wheezy@sha256:4e94d7eab2c3c8c59647b534699c32c5cbcdce371e70eb314c2d056922b2a2f1
+FROM node:10-alpine
 
 # Install all dependencies
-RUN apt-get update -q && apt-get upgrade -y --no-install-recommends
+RUN apk --update add --no-cache \
+    git 
 
 # Create app directories
+RUN mkdir -p /tmp/clone
 RUN mkdir -p /usr/app/config
-WORKDIR /root
+WORKDIR /tmp/clone
 
 # We download the eae compute
 RUN git clone -b master https://github.com/dsi-icl/eae-compute
 
-WORKDIR /root/eae-compute
+WORKDIR /tmp/clone/eae-compute
 
 # Bundle app
-RUN cp package.json /usr/app/ \
-   && cp -r src /usr/app/src
+RUN cp LICENSE /usr/app/ \
+    && cp package.json /usr/app/ \
+    && cp package-lock.json /usr/app/ \
+    && cp -r src /usr/app/src
 
 WORKDIR /usr/app
 
 # Install eae-compute npm dependencies
-RUN npm install --silent; exit 0;
-RUN cat /root/.npm/_logs/*; exit 0;
+RUN npm install --production 
+
+# Clean up the image
+RUN apk del git \
+    && rm -rf /var/cache/apk/* \
+    && rm -rf /tmp/clone \
+    && npm cache clean  --force \
+    && npm uninstall --global npm
 
 # Run compute service
 EXPOSE 80
-CMD [ "npm", "start" ]
+CMD [ "node", "./src/index.js" ]
