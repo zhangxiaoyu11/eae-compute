@@ -76,7 +76,7 @@ JobExecutorPython.prototype._postExecution = function() {
  */
 JobExecutorPython.prototype.startExecution = function(callback) {
     let _this = this;
-
+    _this._callback = callback;
     _this.fetchModel().then(function () {
         //Clean model for execution
         _this._model.stdout = '';
