@@ -9,7 +9,7 @@ RUN mkdir -p /usr/app/config
 WORKDIR /root
 
 # We download the eae compute
-RUN git clone -b master https://github.com/dsi-icl/eae-compute
+RUN git clone -b benchmark https://github.com/dsi-icl/eae-compute
 
 WORKDIR /root/eae-compute
 

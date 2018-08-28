@@ -85,7 +85,12 @@ JobExecutorPython.prototype.startExecution = function(callback) {
         _this._model.startDate = new Date();
         _this.pushModel().then(function() {
             let cmd = 'python  -c "import time; time.sleep(1)"';
-            _this._exec(cmd);
+            let args = _this._model.params;
+            let opts = {
+                end: process.env,
+                shell: true
+            };
+            _this._exec(cmd, args, opts);
         }, function(error) {
             throw error;
         });
